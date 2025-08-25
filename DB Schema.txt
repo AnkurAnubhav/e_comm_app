@@ -1,0 +1,54 @@
+DB SCHEMA
+
+USER Table
+UserId integer pkey
+FirstName varchar(500) NOT NULL
+LastName varchar (500) NOT NULL
+Email varchar(500) UNIQUE NOT NULL 
+LoginId varchar(500) UNIQUE
+PasswordHash CHAR(60) NOT NULL
+CreatedBy varchar(500)
+CreatedDate DateTime
+LastUpdatedBy varchar(500)
+LastUpdatedDate DateTime
+
+Orders Table
+OrderId integer pkey
+UserId integer fkey references USER(UserId)
+OrderPrice decimal 
+OrderDate DateTime
+OrderStatus varchar(50)
+CreatedBy varchar(500)
+CreatedDate DateTime
+LastUpdatedBy varchar(500)
+LastUpdatedDate DateTime
+
+Items Table
+ItemId integer pkey
+ItemName varchar(500)
+Description varchar(500)
+Inventory integer
+Price decimal
+CreatedBy varchar(500)
+CreatedDate DateTime
+LastUpdatedBy varchar(500)
+LastUpdatedDate DateTime
+
+OrderItems Table
+OrderItemId 
+OrderId integer fkey references Orders(OrderId)
+ItemId integer fkey references Items(ItemId)
+Quantity integer NOT NULL
+PRIMARY KEY (OrderId, ItemId)
+
+ShippingAddress
+AddressId integer pkey
+OrderId intger fkey references Orders(orderId)
+ShippingAddress1 varchar(500) NOT NULL
+ShippingAddress2 varchar(500) 
+City varchar(100)
+StateCode varchar(2)
+CountryCode varchar(2)
+PostalCode varchar(10)
+
+
