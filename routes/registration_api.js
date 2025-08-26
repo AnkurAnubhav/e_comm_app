@@ -20,7 +20,7 @@ router.post('/register', async (req, res) => {
     }
     catch(err){
         console.log(err);
-        res.status(500).json("DB error");
+        res.status(500).json("Unable to create user");
     }
 });
 
