@@ -70,12 +70,8 @@ const { client } = require('../db/connection');
                 );
 
                 //Insert the record for the orderItem table
-                body.items.forEach((element) => {
-                    client.query(
-                        'INSERT INTO OrderItems(orderid, itemid, quantity) VALUES($1, $2, $3)', 
-                        [orderId, element.itemId, element.quantity]
-                    );
-                });
+                const values = body.items.map(item => `(${orderId}, ${item.itemId}, ${item.quantity})`).join(',');
+                await client.query(`INSERT INTO OrderItems(orderid, itemid, quantity) VALUES ${values}`);
                 res.status(200).json("Order placed successfully");
             }
         }
