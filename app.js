@@ -4,6 +4,9 @@ const port = process.env.PORT || 3000;
 const orderRoutes = require('./routes/orders_api');
 const registrationRoutes = require('./routes/registration_api');
 const authRoutes = require('./routes/auth_api');
+const itemsRoutes = require('./routes/items_api');
+const customersRoute = require('./routes/customers_api');
+const cartsRoute = require('./routes/cart_api');
 const rateLimit = require('express-rate-limit');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
@@ -75,6 +78,9 @@ app.use(passport.session());
 app.use('/api', orderRoutes);
 app.use('/api', registrationRoutes);
 app.use('/api', authRoutes);
+app.use('/api', itemsRoutes);
+app.use('/api', customersRoute);
+app.use('/api', cartsRoute);
 
 app.get('/', (req, res) => {
   res.send('Hello World!')

@@ -72,6 +72,12 @@ const { client } = require('../db/connection');
                 //Insert the record for the orderItem table
                 const values = body.items.map(item => `(${orderId}, ${item.itemId}, ${item.quantity})`).join(',');
                 await client.query(`INSERT INTO OrderItems(orderid, itemid, quantity) VALUES ${values}`);
+
+                //Reduce inventory for the ordered items
+                for(const item of body.items){
+                   await client.query('UPDATE items SET inventory = inventory - $1 WHERE itemid = $2', [item.quantity, item.itemId]);    
+                };
+
                 res.status(200).json("Order placed successfully");
             }
         }
