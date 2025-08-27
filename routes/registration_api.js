@@ -25,7 +25,7 @@ router.post('/register', async (req, res) => {
 });
 
 
-async function generatePasswordHash(password, saltRounds = 10){
+async function generatePasswordHash(password, saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS) || 10){
     try{
         const salt = await bcrypt.genSalt(saltRounds);
         const hash = await bcrypt.hash(password, salt);

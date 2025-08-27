@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 3000;
@@ -19,8 +20,8 @@ app.use(express.json());
 
 //Add rate limits
 const globalRateLimit = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
+    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
     message: 'Too many requests, please try again later'
 });
 
@@ -28,8 +29,11 @@ app.use(globalRateLimit);
 //initialize session
 app.use(
   session({
-    secret: "f4z4gs$Gcg",
-    cookie: { maxAge: 300000000, secure: false },
+    secret: process.env.SESSION_SECRET || "fallback-secret",
+    cookie: { 
+      maxAge: parseInt(process.env.SESSION_MAX_AGE) || 300000000, 
+      secure: process.env.SESSION_SECURE === 'true' 
+    },
     saveUninitialized: false,
     resave: false,
   })
