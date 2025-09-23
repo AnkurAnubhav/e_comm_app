@@ -310,14 +310,20 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 👥 Authors
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 96f732150696d65c3a7d6bf81a39594abdebdb0f
 - Ankur Anubhav
 
 ## 🐛 Bug Reports
 
 Please report bugs and issues in the GitHub Issues section.
+<<<<<<< HEAD
 
 
 ## 🐛 Bug Reports
 
 Please report bugs and issues in the GitHub Issues section.
+=======
+>>>>>>> 96f732150696d65c3a7d6bf81a39594abdebdb0f
