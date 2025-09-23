@@ -14,6 +14,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const { client } = require('./db/connection');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 // Add this line to parse JSON request bodies
 app.use(express.json());
@@ -73,6 +74,42 @@ passport.use(new LocalStrategy({
                 cb(err);
             }
         })
+}));
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: process.env.GOOGLE_CALLBACK_URL
+}, async (accessToken, refreshToken, profile, done) => {
+    try {
+        // Check if user already exists
+        const existingUser = await client.query(
+            'SELECT * FROM customer WHERE email = $1', 
+            [profile.emails[0].value]
+        );
+
+        if (existingUser.rows.length > 0) {
+            // User exists, return the user
+            return done(null, existingUser.rows[0]);
+        } else {
+            // Create new user
+            const newUser = await client.query(
+                `INSERT INTO customer(firstname, lastname, email, loginid, passwordhash, createdby, createddate) 
+                 VALUES($1, $2, $3, $4, $5, $6, NOW()) RETURNING *`,
+                [
+                    profile.name.givenName,
+                    profile.name.familyName,
+                    profile.emails[0].value,
+                    profile.emails[0].value, // Use email as loginid for OAuth users
+                    'oauth_user', // Placeholder password for OAuth users
+                    'google_oauth'
+                ]
+            );
+            return done(null, newUser.rows[0]);
+        }
+    } catch (error) {
+        return done(error, null);
+    }
 }));
 
 //Add passport for login and session
