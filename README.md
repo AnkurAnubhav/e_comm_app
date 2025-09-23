@@ -310,8 +310,16 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 👥 Authors
 
+<<<<<<< HEAD
 - Ankur Anubhav
 
 ## 🐛 Bug Reports
 
 Please report bugs and issues in the GitHub Issues section.
+=======
+- Your Name - Initial development
+
+## 🐛 Bug Reports
+
+Please report bugs and issues in the GitHub Issues section.
+>>>>>>> 0724fed (Add comprehensive documentation and environment configuration)
