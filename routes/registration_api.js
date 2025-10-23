@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { client } = require('../db/connection');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 //create new customer (registration)
 router.post('/register', async (req, res) => {

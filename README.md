@@ -17,7 +17,7 @@ A RESTful ecommerce API built with Node.js, Express.js, and PostgreSQL featuring
   - Inventory management
 
 - **Shopping Cart**
-  - Session-based cart (no database storage)
+  - Session-based cart with persistent PostgreSQL storage
   - Add/remove items from cart
   - Update item quantities
   - View cart with item details and totals
@@ -41,7 +41,7 @@ A RESTful ecommerce API built with Node.js, Express.js, and PostgreSQL featuring
 - **Database:** PostgreSQL (port 5433)
 - **Authentication:** Passport.js with Local Strategy
 - **Password Hashing:** bcrypt
-- **Session Management:** express-session
+- **Session Management:** express-session with PostgreSQL store
 - **Database Client:** pg (PostgreSQL client)
 - **Security:** express-rate-limit
 
@@ -190,8 +190,12 @@ All configuration is handled through environment variables in the `.env` file:
 
 **Session Configuration:**
 - `SESSION_SECRET` - Secret for session encryption (required, generate randomly)
-- `SESSION_MAX_AGE` - Session timeout in milliseconds
+- `SESSION_MAX_AGE` - Session timeout in milliseconds (default: 24 hours)
 - `SESSION_SECURE` - Set to true in production with HTTPS
+
+**CORS Configuration:**
+- `FRONTEND_URL` - Frontend application URL (default: http://localhost:5173)
+- `NODE_ENV` - Environment mode (development/production)
 
 **Rate Limiting:**
 - `RATE_LIMIT_WINDOW_MS` - Global rate limit window (default: 15 minutes)
@@ -216,6 +220,8 @@ ecommerce-app/
 │   ├── cart_api.js          # Shopping cart
 │   ├── orders_api.js        # Order management
 │   └── customers_api.js     # Customer management
+├── middleware/
+│   └── auth.js              # Authentication middleware
 ├── db/
 │   └── connection.js        # Database connection
 ├── app.js                   # Main application file

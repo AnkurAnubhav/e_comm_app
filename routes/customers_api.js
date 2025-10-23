@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router(); 
 const { client } = require('../db/connection');
+const { isAuthenticated } = require('../middleware/auth');
 
-router.get('/customers/:customerid', async (req, res) => {
+router.get('/customers/:customerid', isAuthenticated, async (req, res) => {
     try{
         const customers = await client.query('SELECT * FROM customers WHERE customerid = $1', [req.params.customerid]);
         if(customers.rows.length === 0){
@@ -25,7 +26,7 @@ router.get('/customers/:customerid', async (req, res) => {
     }
 });
 
-router.put('/customers/update', async (req, res) => {
+router.put('/customers/update', isAuthenticated, async (req, res) => {
     try{
         const body = req.body; 
         const customerId = body.customerId;

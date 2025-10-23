@@ -1,28 +1,54 @@
 const express = require('express')
 const router = express.Router();
 const { client } = require('../db/connection');
+const { isAuthenticated } = require('../middleware/auth');
 
 
-// get all orders when GET request is made to the homepage
-    router.get('/orders/customer/:customerId', async (req, res) => {
-        try{
-            const customerId = req.params.customerId;
-            const orders = await client.query('SELECT * FROM orders WHERE CustomerId = $1', [customerId]);
-            if(orders.rows.length === 0) {
-                res.status(404).json({ message: "Order not found" });
-            } else {
-                res.status(200).json(orders.rows);
-            }
-        }
-        catch(err){
-            console.error(err);
-            res.status(500).json({ error: 'Database error' });
+// get all orders for a customer with items details
+router.get('/orders/customer/:customerId', isAuthenticated, async (req, res) => {
+    try{
+        const customerId = req.params.customerId;
+        
+        // Get all orders for the customer
+        const orders = await client.query(
+            'SELECT * FROM orders WHERE customerid = $1 ORDER BY orderdate DESC', 
+            [customerId]
+        );
+        
+        if(orders.rows.length === 0) {
+            return res.status(200).json([]); // Return empty array instead of 404
         }
         
-    });
+        // For each order, get the order items with item details
+        const ordersWithItems = await Promise.all(
+            orders.rows.map(async (order) => {
+                const orderItems = await client.query(
+                    `SELECT oi.quantity, oi.itemid, i.itemname, i.description, i.price,
+                            (oi.quantity * i.price) as subtotal
+                     FROM orderitems oi
+                     JOIN items i ON oi.itemid = i.itemid
+                     WHERE oi.orderid = $1`,
+                    [order.orderid]
+                );
+                
+                return {
+                    ...order,
+                    items: orderItems.rows,
+                    itemCount: orderItems.rows.length
+                };
+            })
+        );
+        
+        res.status(200).json(ordersWithItems);
+    }
+    catch(err){
+        console.error(err);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
 
 //get an order based on the order id
-    router.get('/orders/:orderId', async (req, res) => {
+    router.get('/orders/:orderId', isAuthenticated, async (req, res) => {
         console.log("received request");
         try{
             let orderId = req.params.orderId;
@@ -43,7 +69,7 @@ const { client } = require('../db/connection');
     });
 
     //post an order based on the payload
-    router.post('/orders/postOrder', async (req, res) => {
+    router.post('/orders/postOrder', isAuthenticated, async (req, res) => {
         console.log("request Received");
         try{
             let body = req.body;

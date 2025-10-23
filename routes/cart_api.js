@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { client } = require('../db/connection');
+const { isAuthenticated } = require('../middleware/auth');
 
 //set up the cart middleware
 function initializeCart(req, res, next){
@@ -10,7 +11,7 @@ function initializeCart(req, res, next){
     next();
 }
 
-router.post('/cart/add', initializeCart, async (req, res) => {
+router.post('/cart/add', isAuthenticated, initializeCart, async (req, res) => {
     try{
         const { itemId, quantity } = req.body;
         
@@ -18,8 +19,8 @@ router.post('/cart/add', initializeCart, async (req, res) => {
             return res.status(400).json({ message: 'Invalid item or quantity' });
         }
 
-        const itemExists = await client.query('SELECT itemid FROM items WHERE itemid = $1', [itemId]);
-        if (itemExists.rows.length === 0) {
+        const itemQuery = await client.query('SELECT itemid, itemname, inventory FROM items WHERE itemid = $1', [itemId]);
+        if (itemQuery.rows.length === 0) {
             return res.status(404).json({ message: 'Item not found' });
         }
 
@@ -55,7 +56,7 @@ router.post('/cart/add', initializeCart, async (req, res) => {
 });
 
 // GET CART (with item details)
-router.get('/cart', initializeCart, async (req, res) => {
+router.get('/cart', isAuthenticated, initializeCart, async (req, res) => {
     try {
         if (req.session.cart.length === 0) {
             return res.status(200).json({ cart: [], total: 0 });
@@ -91,7 +92,7 @@ router.get('/cart', initializeCart, async (req, res) => {
 });
 
 // UPDATE ITEM QUANTITY
-router.put('/cart/item/:itemId', initializeCart, async (req, res) => {
+router.put('/cart/item/:itemId', isAuthenticated, initializeCart, async (req, res) => {
     try {
         const { itemId } = req.params;
         const { quantity } = req.body;
@@ -126,7 +127,7 @@ router.put('/cart/item/:itemId', initializeCart, async (req, res) => {
 });
 
 // REMOVE ITEM FROM CART
-router.delete('/cart/item/:itemId', initializeCart, async (req, res) => {
+router.delete('/cart/item/:itemId', isAuthenticated, initializeCart, async (req, res) => {
     try {
         const { itemId } = req.params;
         
@@ -149,7 +150,7 @@ router.delete('/cart/item/:itemId', initializeCart, async (req, res) => {
 });
 
 // CLEAR CART
-router.delete('/cart', initializeCart, async (req, res) => {
+router.delete('/cart', isAuthenticated, initializeCart, async (req, res) => {
     try {
         req.session.cart = [];
         res.status(200).json({ message: 'Cart cleared' });
